@@ -4,10 +4,7 @@ package com.example.employeeapi.rest;
 import com.example.employeeapi.Employee;
 import com.example.employeeapi.dao.EmployeeDAO;
 import com.example.employeeapi.service.EmployeeService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,6 +24,32 @@ public class EmployeeRestcontroller {
 
     @GetMapping("/employees/{empId}")
     Employee getEmployee(@PathVariable int empId) {
-        return employeeService.findById(empId);
+        Employee employee = employeeService.findById(empId);
+        if (employee == null) {
+            throw new RuntimeException("Employee with id " + empId + " not found");
+        }
+        return employee;
+    }
+    @PostMapping("/employees")
+    Employee addEmployee(@RequestBody Employee employee) {
+        employee.setId(0);
+        Employee savedEmployee = employeeService.save(employee);
+        return savedEmployee;
+    }
+    @PutMapping("/employees/{employeeid}")
+    Employee updateEmployee(@RequestBody Employee employee, @PathVariable int employeeid) {
+        employee.setId(employeeid);
+        Employee savedEmployee = employeeService.save(employee);
+        return savedEmployee;
+    }
+
+    @DeleteMapping("/employees/{employeeid}")
+    String deleteEmployee(@PathVariable int employeeid) {
+        Employee employee = employeeService.findById(employeeid);
+        if (employee == null){
+            return "Employee id not found";
+        }
+        employeeService.delete(employeeid);
+        return "Deleted employee with id " + employeeid;
     }
 }
